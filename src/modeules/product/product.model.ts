@@ -1,11 +1,10 @@
-import { Schema, model } from "mongoose";
-import { Inventory, Product, Variant, VariantType } from "./product.interface";
+import mongoose from "mongoose";
+import { IInventory, IProduct, IVariant } from "./product.interface";
+// import { IInventory, IProduct, IVariant } from "./product.interface";
 
-// Variant Schema
-const VariantSchema = new Schema<Variant>({
+const variantsSchema = new mongoose.Schema<IVariant>({
   type: {
     type: String,
-    enum: Object.values(VariantType),
     required: true,
   },
   value: {
@@ -14,8 +13,7 @@ const VariantSchema = new Schema<Variant>({
   },
 });
 
-// Inventory Schema
-const InventorySchema = new Schema<Inventory>({
+const inventorySchema = new mongoose.Schema<IInventory>({
   quantity: {
     type: Number,
     required: true,
@@ -26,36 +24,35 @@ const InventorySchema = new Schema<Inventory>({
   },
 });
 
-// Product Schema
-const ProductSchema = new Schema<Product>({
+const productSchema = new mongoose.Schema<IProduct>({
   name: {
     type: String,
-    required: [true, "Name is required"],
+    required: true,
+    unique: true,
   },
   description: {
     type: String,
-    required: [true, "Description is required"],
+    required: true,
   },
   price: {
     type: Number,
-    required: [true, "Price is required"],
+    required: true,
   },
   category: {
     type: String,
-    required: [true, "Category is required"],
+    required: true,
   },
   tags: {
     type: [String],
-    required: [true, "Tags are required"],
+    required: true,
   },
   variants: {
-    type: [VariantSchema],
-    required: [true, "Variants are required"],
+    type: [variantsSchema],
   },
   inventory: {
-    type: InventorySchema,
-    required: [true, "Inventory is required"],
+    type: inventorySchema,
+    required: true,
   },
 });
 
-export const ProductModel = model<Product>("Product", ProductSchema);
+export const ProductModel = mongoose.model("Product", productSchema);

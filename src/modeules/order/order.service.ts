@@ -1,9 +1,10 @@
 import { ProductModel } from "../product/product.model";
 import { IOrder } from "./order.interface";
+//import { IOder } from "./oder.interface";
 import { OrderModel } from "./order.model";
 
-export const getOrderService = async (email?: string) => {
-  // retrieve orders by email. if email is not provided, it will return all orders
+const getOrderService = async (email: string) => {
+  // retrieve order by email. if email is not provided, it will return all orders
   const emailQuery = email ? { email } : {};
 
   const result = await OrderModel.find(emailQuery);
@@ -13,24 +14,28 @@ export const getOrderService = async (email?: string) => {
   throw new Error("Order not found");
 };
 
-export const createOrderService = async (order: IOrder) => {
+const createOrderService = async (order: IOrder) => {
   const id = order.productId;
   const isExist = await ProductModel.findById(id);
+  console.log("Product found:", isExist);
+
   if (!isExist) {
     throw new Error("Product not found!");
   } else {
-    const updatedQuantity = isExist.inventory.quantity - order.quantity;
+    const updatedQuantity = isExist?.inventory?.quantity - order?.quantity;
 
-    if (isExist.inventory.inStock && updatedQuantity >= 0) {
+    if (
+      isExist.inventory.inStock &&
+      updatedQuantity >= 0 &&
+      updatedQuantity <= isExist?.inventory?.quantity
+    ) {
       const result = await OrderModel.create(order);
 
       await ProductModel.updateOne(
         { _id: id },
         {
-          $set: {
-            "inventory.quantity": updatedQuantity,
-            "inventory.inStock": updatedQuantity > 0,
-          },
+          "inventory.quantity": updatedQuantity,
+          "inventory.inStock": updatedQuantity > 0,
         }
       );
       return result;
@@ -39,8 +44,7 @@ export const createOrderService = async (order: IOrder) => {
     }
   }
 };
-
-export const OrderServices = {
+export const OrderService = {
   getOrderService,
   createOrderService,
 };

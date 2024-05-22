@@ -1,15 +1,21 @@
 import express, { NextFunction, Request, Response } from "express";
 // Corrected typo
 import cors from "cors";
-import { OrderRoute } from "./modeules/order/order.route";
+import { OrderRoutes } from "./modeules/order/order.route";
 import { ProductRoute } from "./modeules/product/product.route";
 
 const app = express();
 app.use(express.json());
-app.use(cors());
+
+const corsConfig = {
+  origin: "*",
+  credential: true,
+  methods: ["GET", "POST", "PUT", "DELETE"],
+};
+app.use(cors(corsConfig));
 
 app.use("/api/products", ProductRoute);
-app.use("/api/orders", OrderRoute);
+app.use("/api/orders", OrderRoutes);
 
 app.get("/", (req: Request, res: Response) => {
   res.json({ success: true, server: "Server is On" });
